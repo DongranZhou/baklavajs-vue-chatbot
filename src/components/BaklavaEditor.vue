@@ -5,17 +5,18 @@
 import nodes from '../node/index'
 import "@baklavajs/themes/dist/syrup-dark.css";
 import { stringType, numberType, booleanType } from './interfaceTypes'
+import { useGraphStore } from '../store';
 
 import {
   EditorComponent,
   useBaklava,
   applyResult,
-  IEditorState,
   DependencyEngine,
   BaklavaInterfaceTypes,
   IGraphState,
 } from "baklavajs";
 
+const graphStore = useGraphStore();
 const baklava = useBaklava();
 
 baklava.settings.enableMinimap = true;
@@ -56,13 +57,15 @@ const runOnce = (calculationData: any) => {
         const value: any = res?.get(outputNode.id)?.get('message')
         resolve(value);
       } else {
-        reject("没有输出节点")
+        reject("没有输出节点(OutputNode)")
       }
     }).catch(err => {
       reject(err)
     })
   })
 }
+
+baklava.editor.graph.load(graphStore.createNewGraph());
 
 defineExpose({ getGraph, setGraph, runOnce });
 </script>

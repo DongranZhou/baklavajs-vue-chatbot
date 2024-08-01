@@ -42,6 +42,7 @@ const deleteScene = (index: number = -1) => {
         graphStore.currentGraph = -1;
         emits('onSelected', index)
     } else {
+        if (graphStore.currentGraph == index) { graphStore.currentGraph = -1; }
         graphStore.deleteGraph(index);
     }
 }

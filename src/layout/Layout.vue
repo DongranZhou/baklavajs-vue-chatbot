@@ -26,6 +26,21 @@
             <div style="display: flex;">
               <ElButton @click="saveCurrent">保存</ElButton>
               <ElDropdown style="margin-left: 10px;" trigger="click">
+                <ElButton>系统</ElButton>
+                <template #dropdown>
+                  <ElDropdownMenu>
+                    <ElDropdownItem @click="exportData">导出</ElDropdownItem>
+                    <ElDropdownItem>
+                      <ElUpload :auto-upload="false" :show-file-list="false" :on-change="importData">
+                        <template #trigger>
+                          导入
+                        </template>
+                      </ElUpload>
+                    </ElDropdownItem>
+                  </ElDropdownMenu>
+                </template>
+              </ElDropdown>
+              <ElDropdown style="margin-left: 10px;" trigger="click">
                 <ElButton>对话</ElButton>
                 <template #dropdown>
                   <ElDropdownMenu>
@@ -33,17 +48,31 @@
                     <ElDropdownItem @click="saveAsNewHistory">另存</ElDropdownItem>
                     <ElDropdownItem @click="saveHistory">保存</ElDropdownItem>
                     <ElDropdownItem @click="exportHistory">导出</ElDropdownItem>
+                    <ElDropdownItem>
+                      <ElUpload :auto-upload="false" :show-file-list="false" :on-change="importHistory">
+                        <template #trigger>
+                          导入
+                        </template>
+                      </ElUpload>
+                    </ElDropdownItem>
                   </ElDropdownMenu>
                 </template>
               </ElDropdown>
               <ElDropdown style="margin-left: 10px;" trigger="click">
-                <ElButton>场景</ElButton>
+                <ElButton>图像</ElButton>
                 <template #dropdown>
                   <ElDropdownMenu>
                     <ElDropdownItem @click="createNewScene">新建</ElDropdownItem>
                     <ElDropdownItem @click="saveAsNewScene">另存</ElDropdownItem>
                     <ElDropdownItem @click="saveScene">保存</ElDropdownItem>
                     <ElDropdownItem @click="exportScene">导出</ElDropdownItem>
+                    <ElDropdownItem>
+                      <ElUpload :auto-upload="false" :show-file-list="false" :on-change="importScene">
+                        <template #trigger>
+                          导入
+                        </template>
+                      </ElUpload>
+                    </ElDropdownItem>
                   </ElDropdownMenu>
                 </template>
               </ElDropdown>
@@ -104,7 +133,7 @@ import ChatHistory from "../components/ChatHistory.vue";
 import InputDialog from "../components/InputDialog.vue";
 import HistoryLayout from "./HistoryLayout.vue";
 import SceneLayout from "./SceneLayout.vue";
-import { ElButton, ElDropdown, ElDropdownItem, ElDropdownMenu, ElMessage, ElRadioButton, ElRadioGroup, ElRow, ElText } from "element-plus";
+import { ElUpload, ElButton, ElDropdown, ElDropdownItem, ElDropdownMenu, ElMessage, ElRadioButton, ElRadioGroup, ElRow, ElText } from "element-plus";
 
 const graphStore = useGraphStore();
 const historyStore = useHistoryStore();
@@ -116,6 +145,10 @@ const view = ref("chat")
 
 const running = ref(false);
 const inputMessage = ref("");
+
+/**
+ * 执行函数，用于处理输入框中的消息
+ */
 const execute = () => {
   if (inputMessage.value) {
     running.value = true;
@@ -132,7 +165,31 @@ const execute = () => {
     });
   }
 };
-
+/**
+ * 导出所有数据（所有对话历史，所有图像）
+ */
+const exportData = () => {
+  exportJson({ graphs: graphStore.graphs, histories: historyStore.histories }, 'data.json');
+}
+/**
+ * 导入所有数据（所有对话历史，所有图像）
+ */
+const importData = (file: any) => {
+  const reader = new FileReader();
+  reader.readAsText(file.raw, "utf8")
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target?.result as string)
+      graphStore.graphs = data.graphs;
+      historyStore.histories = data.histories;
+    } catch (error) {
+      console.error(error)
+    }
+  }
+}
+/**
+ * 保存当前打开的对话及图像
+ */
 const saveCurrent = () => {
   if (graphStore.currentGraph == -1 || historyStore.currentHistory == -1) {
     dialog.value?.openDialog('保存', (input: string) => {
@@ -173,7 +230,9 @@ const saveCurrent = () => {
     }
   }
 }
-
+/**
+ * 打开新图像
+ */
 const createNewScene = () => {
   const graph = graphStore.createNewGraph();
   if (graph) {
@@ -181,7 +240,9 @@ const createNewScene = () => {
     graphStore.currentGraph = -1;
   }
 }
-
+/**
+ * 当前图像另存为
+ */
 const saveAsNewScene = () => {
   dialog.value?.openDialog('另存场景为', (input: string) => {
     const graph = baklava.value?.getGraph();
@@ -190,7 +251,9 @@ const saveAsNewScene = () => {
     }
   });
 }
-
+/**
+ * 保存当前图像
+ */
 const saveScene = () => {
   if (graphStore.currentGraph == -1) {
     dialog.value?.openDialog('保存场景', (input: string) => {
@@ -208,17 +271,38 @@ const saveScene = () => {
     }
   }
 }
-
+/**
+ * 导出当前图像
+ */
 const exportScene = () => {
   exportJson(baklava.value?.getGraph(), 'scene.json');
 }
-
+/**
+ * 导入当前图像
+ */
+const importScene = (file: any) => {
+  const reader = new FileReader();
+  reader.readAsText(file.raw, "utf8")
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target?.result as string)
+      baklava.value?.setGraph(data.state);
+    } catch (error) {
+      console.error(error)
+    }
+  }
+}
+/**
+ * 选择一个图像
+ */
 const onSceneSelected = (index: number, graph: any) => {
   if (graph) {
     baklava.value?.setGraph(graph.state)
   }
 }
-
+/**
+ * 打开新对话
+ */
 const createNewHistory = () => {
   const history = historyStore.createNewHistory();
   if (history) {
@@ -226,7 +310,9 @@ const createNewHistory = () => {
     historyStore.currentHistory = -1;
   }
 }
-
+/**
+ * 当前对话另存为
+ */
 const saveAsNewHistory = () => {
   dialog.value?.openDialog('另存对话为', (input: string) => {
     const history = chat.value?.getHistory();
@@ -235,7 +321,9 @@ const saveAsNewHistory = () => {
     }
   });
 }
-
+/**
+ * 保存当前对话
+ */
 const saveHistory = () => {
   if (historyStore.currentHistory == -1) {
     dialog.value?.openDialog('保存对话', (input: string) => {
@@ -253,25 +341,56 @@ const saveHistory = () => {
     }
   }
 }
-
+/**
+ * 导出当前对话
+ */
 const exportHistory = () => {
   exportJson(chat.value?.getHistory(), 'history.json');
 }
-
+/**
+ * 导入当前对话
+ */
+const importHistory = (file: any) => {
+  const reader = new FileReader();
+  reader.readAsText(file.raw, "utf8")
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target?.result as string)
+      chat.value?.openHistory(data)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+}
+/**
+ * 选择一个对话
+ */
 const onHistorySelected = (index: number, history: any) => {
   if (history) {
     chat.value?.openHistory(history.history)
   }
 }
-
+/**
+ * 将对象转为json文件并下载
+ */
 const exportJson = (data: any, filename: string = "json.json") => {
   if (!filename) filename = "json.json";
   if (!data) {
     alert("保存的数据为空");
     return;
   }
+
   if (typeof data === "object") {
-    data = JSON.stringify(data, undefined, 4);
+    var cache: any = []
+    data = JSON.stringify(data, (k, v) => {
+      if (typeof v === "object" && v !== null) {
+        if (cache.indexOf(v) !== -1) {
+          return undefined;
+        }
+        cache.push(v);
+      }
+      return v;
+    }, 4);
   }
   var blob = new Blob([data], { type: "text/json" });
   const a = document.createElement("a");

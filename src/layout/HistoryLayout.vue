@@ -32,6 +32,7 @@ const deleteHistory = (index: number = -1) => {
         historyStore.currentHistory = -1;
         emits('onSelected', index)
     } else {
+        if (historyStore.currentHistory == index) { historyStore.currentHistory = -1; }
         historyStore.deleteHistory(index);
     }
 }

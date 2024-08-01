@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import { IGraphState } from "baklavajs";
+import { INodeState, IGraphState, NodeInterface } from "baklavajs";
 import { uuid } from "../util";
 
 interface GraphState {
@@ -25,16 +25,61 @@ export const useGraphStore = defineStore("graphs", () => {
     return graphs.value[index];
   };
   const save = () => {
-    localStorage.setItem("graphs", JSON.stringify(graphs.value));
+    var cache: any = [];
+    localStorage.setItem(
+      "graphs",
+      JSON.stringify(graphs.value, (k, v) => {
+        if (typeof v === "object" && v !== null) {
+          if (cache.indexOf(v) !== -1) {
+            cache.push(v);
+            return undefined;
+          }
+        }
+        return v;
+      })
+    );
   };
   const createNewGraph = (): IGraphState => {
     return {
       id: uuid(),
-      nodes: [],
-      connections: [],
+      nodes: [
+        {
+          id: uuid(),
+          type: "InputNode",
+          title: "Input",
+          inputs: {},
+          outputs: {
+            message: {
+              id: "2f84537d-2f36-4601-af16-a008656f1a5e",
+              value: new NodeInterface("message", "string"),
+            },
+          },
+          position: { x: 0, y: 0 },
+        } as any,
+        {
+          id: uuid(),
+          type: "OutputNode",
+          title: "Output",
+          inputs: {
+            message: {
+              id: "db23c0fe-64c3-4d65-8685-8f8769ad05ef",
+              value: new NodeInterface("message", "string"),
+            },
+          },
+          outputs: {},
+          position: { x: 300, y: 0 },
+        } as any,
+      ],
+      connections: [
+        {
+          id: uuid(),
+          from: "2f84537d-2f36-4601-af16-a008656f1a5e",
+          to: "db23c0fe-64c3-4d65-8685-8f8769ad05ef",
+        },
+      ],
       inputs: [],
       outputs: [],
-      panning: { x: 0, y: 0 },
+      panning: { x: 0, y: 200 },
       scaling: 1,
     };
   };
