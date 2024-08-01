@@ -79,7 +79,7 @@
             </div>
             <div style="display: flex;">
               <ElRadioGroup v-model="view">
-                <ElRadioButton value="chat">Chat</ElRadioButton>
+                <ElRadioButton value="history">History</ElRadioButton>
                 <ElRadioButton value="both">Both</ElRadioButton>
                 <ElRadioButton value="graph">Graph</ElRadioButton>
               </ElRadioGroup>
@@ -94,8 +94,8 @@
               padding: 0;
               display: flex;
             ">
-          <ChatHistory style="margin:0 2px;" :class="[view == 'chat' ? 'full' : '', view == 'both' ? 'half' : '']"
-            v-show="view == 'both' || view == 'chat'" ref="chat"></ChatHistory>
+          <ChatHistory style="margin:0 2px;" :class="[view == 'history' ? 'full' : '', view == 'both' ? 'half' : '']"
+            v-show="view == 'both' || view == 'history'" ref="chat"></ChatHistory>
           <BaklavaEditor style="margin:0 2px;" :class="[view == 'graph' ? 'full' : '', view == 'both' ? 'half' : '']"
             v-show="view == 'both' || view == 'graph'" ref="baklava" />
         </ElMain>
