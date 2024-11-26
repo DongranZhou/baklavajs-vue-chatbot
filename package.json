@@ -9,11 +9,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@types/crypto-js": "^4.2.2",
+    "@types/js-cookie": "^3.0.6",
     "axios": "^1.7.2",
     "baklavajs": "^2.4.5",
+    "crypto-js": "^4.2.0",
     "dayjs": "^1.11.11",
     "element-plus": "^2.7.4",
     "github-markdown-css": "^5.6.0",
+    "js-cookie": "^3.0.5",
     "jsonpath-plus": "^9.0.0",
     "marked": "^13.0.0",
     "ollama": "^0.5.1",

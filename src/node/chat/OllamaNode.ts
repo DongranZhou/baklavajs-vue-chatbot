@@ -13,6 +13,7 @@ interface Inputs {
   model: string;
   history:string;
   message: string;
+  system:string;
 }
 
 interface Outputs {
@@ -33,7 +34,8 @@ export default class OllamaNode extends Node<Inputs, Outputs> {
   public inputs = {
     host: new TextInputInterface("baseURL", "http://127.0.0.1:11434/"),
     model: new SelectInterface("model", "", [""]).setPort(false),
-    history: new NodeInterface("history", ""),
+    history: new NodeInterface("history", "[]"),
+    system: new TextareaInputInterface("system", ""),
     message: new TextareaInputInterface("message", "你好"),
   };
   public outputs = {
@@ -65,19 +67,37 @@ export default class OllamaNode extends Node<Inputs, Outputs> {
   }
 
   public calculate: CalculateFunction<Inputs, Outputs> = async (
-    { model, message,history },
+    { model, message,history,system },
     { globalValues }
   ): Promise<Outputs> => {
     var output = { message: "" };
     if (globalValues?.exec && message) {
-      let _history = JSON.parse(history);
-      _history.push({ role: "user", content: message });
+      let messages = this.getMessages({ history,system,message } as Inputs);
       const res = await this.ollama?.chat({
         model: model,
-        messages: [{ role: "user", content: message }],
+        messages: messages,
       });
       output.message = res?.message?.content ?? "";
     }
     return output;
+  };
+
+  getMessages: (inputs: Inputs) => Array<any> = ({
+    system,
+    history,
+    message,
+  }) => {
+    let messages: Array<any> = JSON.parse(history ?? "[]") ?? [];
+    messages.push({ role: "user", content: message });
+    if(system)
+    {
+      let sysMsg = messages.find((item) => item.role == "system");
+      if (sysMsg) {
+        sysMsg.content = system;
+      } else {
+        messages.unshift({ role: "system", content: system });
+      }
+    }
+    return messages;
   };
 }

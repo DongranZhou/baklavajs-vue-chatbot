@@ -1,39 +1,42 @@
 import {
   Node,
+  TextInputInterface,
   CalculateFunction,
   NodeInterface,
+  setType,
 } from "baklavajs";
+import { stringType } from "../../components/interfaceTypes";
 
 interface Inputs {
-  message: string;
-}
-
-interface Outputs {
   
 }
 
-export default class OutputNode extends Node<Inputs, Outputs> {
+interface Outputs {
+  message: string;
+}
+
+export default class InputTextNode extends Node<Inputs, Outputs> {
   public constructor() {
     super();
     this.initializeIo();
   }
 
-  public type = "OutputNode";
-  public _title = "Output";
+  public type = "InputTextNode";
+  public _title = "InputText";
 
   public inputs = {
-    message: new NodeInterface("message", ""),
+    
   };
   public outputs = {
-    
+    message: new NodeInterface("message", "").use(setType, stringType),
   };
 
   public calculate: CalculateFunction<Inputs, Outputs> = async (
-    { message },
+    {  },
     { globalValues }
   ): Promise<Outputs> => {
     return {
-      message
+      message: globalValues?.message,
     };
   };
 }

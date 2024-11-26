@@ -1,10 +1,7 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
+import ChatMessage from "../models/ChatMessage";
 
-interface ChatMessage {
-  role: string;
-  content: string;
-}
 interface ChatHistory {
   history: Array<ChatMessage>;
   name: string;

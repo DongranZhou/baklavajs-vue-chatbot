@@ -4,6 +4,7 @@ import {
   CalculateFunction,
   NodeInterface,
 } from "baklavajs";
+import dayjs from "dayjs";
 
 interface Inputs {
   message: string;
@@ -37,6 +38,7 @@ export default class DelayNode extends Node<Inputs, Outputs> {
   ): Promise<Outputs> => {
     return new Promise((resolve) => {
       setTimeout(() => {
+        console.log(delay , message , dayjs());
         resolve({
           message: message,
         });

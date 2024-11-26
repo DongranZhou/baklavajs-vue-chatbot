@@ -11,16 +11,12 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import { ElText, ElScrollbar ,ElTag} from "element-plus";
 import MDEditor from "../components/MDEditor.vue";
+import { ChatMessage } from "../models/index";
 
 const scroller = ref<InstanceType<typeof ElScrollbar>>()
-
-interface ChatMessage {
-  role: string;
-  content: string;
-}
 
 const messages = ref<Array<ChatMessage>>([])
 

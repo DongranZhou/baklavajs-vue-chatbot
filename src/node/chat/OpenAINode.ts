@@ -14,6 +14,7 @@ interface Inputs {
   model: string;
   history: string;
   message: string;
+  system:string;
 }
 
 interface Outputs {
@@ -35,7 +36,8 @@ export default class OpenAINode extends Node<Inputs, Outputs> {
     baseURL: new TextInputInterface("baseURL", "http://127.0.0.1:3000/v1"),
     apiKey: new TextInputInterface("apiKey", ""),
     model: new SelectInterface("model", "gpt-4", ['gpt-4', 'gpt-4-0314', 'gpt-4-32k', 'gpt-4-32k-0314', 'gpt-3.5-turbo', 'gpt-3.5-turbo-0301']),
-    history: new NodeInterface("history", ""),
+    history: new NodeInterface("history", "[]"),
+    system: new TextareaInputInterface("system",""),
     message: new TextareaInputInterface("message", ""),
   };
   public outputs = {
@@ -73,16 +75,15 @@ export default class OpenAINode extends Node<Inputs, Outputs> {
   }
 
   public calculate: CalculateFunction<Inputs, Outputs> = async (
-    { model, message, history },
+    { model, message, history ,system},
     { globalValues }
   ): Promise<Outputs> => {
     var output = { message: "" };
     if (globalValues?.exec && message && model) {
-      let _history = JSON.parse(history);
-      _history.push({ role: "user", content: message });
+      let messages = this.getMessages({ history,system,message } as Inputs);
       let res = await this.openai?.chat.completions.create({
         model,
-        messages: _history,
+        messages: messages,
         stream: false,
       });
       if (res?.choices?.length) {
@@ -90,5 +91,24 @@ export default class OpenAINode extends Node<Inputs, Outputs> {
       }
     }
     return output;
+  };
+
+  getMessages: (inputs: Inputs) => Array<any> = ({
+    system,
+    history,
+    message,
+  }) => {
+    let messages: Array<any> = JSON.parse(history ?? "[]") ?? [];
+    messages.push({ role: "user", content: message });
+    if(system)
+    {
+      let sysMsg = messages.find((item) => item.role == "system");
+      if (sysMsg) {
+        sysMsg.content = system;
+      } else {
+        messages.unshift({ role: "system", content: system });
+      }
+    }
+    return messages;
   };
 }

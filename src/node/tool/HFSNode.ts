@@ -5,7 +5,7 @@ import {
   defineDynamicNode,
   NodeInterface,
 } from "baklavajs";
-import { hfsClient } from "../../hfs-client/hfsClient";
+import { hfsClient } from "../../hfsclient/hfsClient";
 
 export default defineDynamicNode({
   type: "HFSNode",
@@ -89,7 +89,7 @@ export default defineDynamicNode({
       if (inputs.api == "get_file_list") {
         var list = await client.get_file_list(inputs.uri);
         return {
-          data: JSON.stringify(list?.data),
+          data: JSON.stringify(list.list),
         };
       }
       if (inputs.api == "get_file_details") {

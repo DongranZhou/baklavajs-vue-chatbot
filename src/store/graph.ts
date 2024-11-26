@@ -32,7 +32,7 @@ export const useGraphStore = defineStore("graphs", () => {
         if (typeof v === "object" && v !== null) {
           if (cache.indexOf(v) !== -1) {
             cache.push(v);
-            return undefined;
+            return ;
           }
         }
         return v;
@@ -45,17 +45,17 @@ export const useGraphStore = defineStore("graphs", () => {
       nodes: [
         {
           id: uuid(),
-          type: "InputNode",
-          title: "Input",
+          type: "InputTextNode",
+          title: "InputText",
           inputs: {},
           outputs: {
             message: {
               id: "2f84537d-2f36-4601-af16-a008656f1a5e",
-              value: new NodeInterface("message", "string"),
+              value: "",
             },
           },
           position: { x: 0, y: 0 },
-        } as any,
+        },
         {
           id: uuid(),
           type: "OutputNode",
@@ -63,7 +63,7 @@ export const useGraphStore = defineStore("graphs", () => {
           inputs: {
             message: {
               id: "db23c0fe-64c3-4d65-8685-8f8769ad05ef",
-              value: new NodeInterface("message", "string"),
+              value: "",
             },
           },
           outputs: {},

@@ -30,5 +30,5 @@ onMounted(async ()=>{
 })
 </script>
 <style>
-a{}
+
 </style>

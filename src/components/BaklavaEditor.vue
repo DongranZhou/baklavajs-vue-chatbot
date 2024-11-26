@@ -6,6 +6,7 @@ import nodes from '../node/index'
 import "@baklavajs/themes/dist/syrup-dark.css";
 import { stringType, numberType, booleanType } from './interfaceTypes'
 import { useGraphStore } from '../store';
+import { AsyncForwardEngine } from './asyncForwardEngine.ts'
 
 import {
   EditorComponent,
@@ -27,6 +28,7 @@ nodes.forEach((el) => {
 })
 
 const token = Symbol();
+//const engine = new AsyncForwardEngine(baklava.editor);
 const engine = new DependencyEngine(baklava.editor);
 engine.events.afterRun.subscribe(token, (result) => {
   engine.pause();

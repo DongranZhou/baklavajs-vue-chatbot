@@ -13,7 +13,8 @@ interface Inputs {
 }
 
 interface Outputs {
-  json: string;
+  node: string;
+  array: string;
 }
 
 export default class JsonPathNode extends Node<Inputs, Outputs> {
@@ -30,7 +31,8 @@ export default class JsonPathNode extends Node<Inputs, Outputs> {
     json: new TextareaInputInterface("json", ""),
   };
   public outputs = {
-    json: new NodeInterface("json", ""),
+    array: new NodeInterface("array", ""),
+    node: new NodeInterface("node", ""),
   };
   public calculate: CalculateFunction<Inputs, Outputs> = async (
     { json, path },
@@ -38,8 +40,8 @@ export default class JsonPathNode extends Node<Inputs, Outputs> {
   ): Promise<Outputs> => {
     if (path && json) {
       const result = JSONPath({ path: path, json: JSON.parse(json) });
-      return { json: JSON.stringify(result) };
+      return { array: JSON.stringify(result) , node: result.length > 0 ? JSON.stringify(result[0]) : "" };
     }
-    return { json: "" };
+    return { array: "" , node: "" };
   };
 }
