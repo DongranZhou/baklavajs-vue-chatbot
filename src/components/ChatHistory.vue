@@ -5,7 +5,7 @@
     style="border-radius: 4px;  background-color: #2c3748">
     <div v-for="(message, index) in messages" :key="index" style="margin: 15px;" :class="message.role">
       <ElText class="message-user">{{ message.role }}</ElText>
-      <MDEditor class="message-content" :md="message.content"></MDEditor>
+      <MDEditor class="message-content" :md="message.content?.toString()"></MDEditor>
     </div>
   </ElScrollbar>
 </template>
@@ -14,7 +14,7 @@
 import { ref, onMounted } from "vue";
 import { ElText, ElScrollbar ,ElTag} from "element-plus";
 import MDEditor from "../components/MDEditor.vue";
-import { ChatMessage } from "../models/index";
+import  ChatMessage  from "../models/ChatMessage";
 
 const scroller = ref<InstanceType<typeof ElScrollbar>>()
 

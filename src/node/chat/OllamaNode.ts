@@ -7,6 +7,7 @@ import {
   SelectInterface,
 } from "baklavajs";
 import { Ollama } from "ollama/browser";
+import ChatMessage from "../../models/ChatMessage";
 
 interface Inputs {
   host: string;
@@ -75,19 +76,19 @@ export default class OllamaNode extends Node<Inputs, Outputs> {
       let messages = this.getMessages({ history,system,message } as Inputs);
       const res = await this.ollama?.chat({
         model: model,
-        messages: messages,
+        messages: messages as any,
       });
       output.message = res?.message?.content ?? "";
     }
     return output;
   };
 
-  getMessages: (inputs: Inputs) => Array<any> = ({
+  getMessages: (inputs: Inputs) => Array<ChatMessage> = ({
     system,
     history,
     message,
   }) => {
-    let messages: Array<any> = JSON.parse(history ?? "[]") ?? [];
+    let messages: Array<ChatMessage> = JSON.parse(history ?? "[]") ?? [];
     messages.push({ role: "user", content: message });
     if(system)
     {

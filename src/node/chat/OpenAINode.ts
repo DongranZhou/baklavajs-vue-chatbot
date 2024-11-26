@@ -7,6 +7,7 @@ import {
   CalculateFunction,
 } from "baklavajs";
 import OpenAI from "openai";
+import ChatMessage from "../../models/ChatMessage";
 
 interface Inputs {
   baseURL: string;
@@ -83,7 +84,7 @@ export default class OpenAINode extends Node<Inputs, Outputs> {
       let messages = this.getMessages({ history,system,message } as Inputs);
       let res = await this.openai?.chat.completions.create({
         model,
-        messages: messages,
+        messages: messages as any,
         stream: false,
       });
       if (res?.choices?.length) {
@@ -93,12 +94,12 @@ export default class OpenAINode extends Node<Inputs, Outputs> {
     return output;
   };
 
-  getMessages: (inputs: Inputs) => Array<any> = ({
+  getMessages: (inputs: Inputs) => Array<ChatMessage> = ({
     system,
     history,
     message,
   }) => {
-    let messages: Array<any> = JSON.parse(history ?? "[]") ?? [];
+    let messages: Array<ChatMessage> = JSON.parse(history ?? "[]") ?? [];
     messages.push({ role: "user", content: message });
     if(system)
     {
